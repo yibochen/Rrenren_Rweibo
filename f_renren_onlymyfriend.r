@@ -4,8 +4,8 @@
 
 f_renren_onlymyfriend <- function(name="******", pwd="******"){
 
-library(RCurl)
-library(rjson)
+require(RCurl)
+require(rjson)
 memory.limit(4000)
 
 myH <- c(
@@ -186,43 +186,46 @@ myfrienddata <- frienddata[frienddata[, 2] == uid, ]
 frienddata_gg <- frienddata[frienddata[, 4] %in% myfrienddata[, 4] & frienddata[, 2] != uid, c(2, 4)]
 # myfrienddata <- myfrienddata[myfrienddata[, 4] %in% c(frienddata_gg[, 1], frienddata_gg[, 2]), ]
 
-library(igraph)
+require(igraph)
 
 people <- unique(data.frame(id=myfrienddata[, 4], name=myfrienddata[, 3]))
 gg <- graph.data.frame(d=frienddata_gg, directed=F, vertices=people)
 is.simple(gg)
-gg <- simplify(gg)
-is.simple(gg)
+gg1 <- simplify(gg)
+is.simple(gg1)
 
-dg <- degree(gg)
-gg <- subgraph(gg, which(dg > 0) - 1)
+dg <- degree(gg1)
+gg2 <- induced.subgraph(gg1, which(dg > 0))
 
 # 子群划分
-com <- walktrap.community(gg, steps=5)
-subgroup <- split(com$labels, com$membership)
-V(gg)$sg <- com$membership + 1
-V(gg)$color <- rainbow(max(V(gg)$sg))[V(gg)$sg]
+com <- walktrap.community(gg2, steps=5)
+# plot(com, gg2)
+subgroup <- split(com$names, com$membership)
+V(gg2)$sg <- com$membership
+V(gg2)$color <- rainbow(max(V(gg2)$sg), alpha=0.75)[V(gg2)$sg]
 # 中间度
-V(gg)$bte <- betweenness(gg, directed=F)
-top <- quantile(V(gg)$bte,0.99)
-V(gg)$size <- 5
-V(gg)[bte>=top]$size <- 15
-V(gg)$label <- NA
-V(gg)[bte>=top]$label <- V(gg)[bte>=top]$name
-V(gg)$cex <- 1
-V(gg)[bte>=top]$cex <- 2
+V(gg2)$bte <- betweenness(gg2, directed=F)
+top <- quantile(V(gg2)$bte,0.99)
+V(gg2)$size <- 5
+V(gg2)[bte>=top]$size <- 15
+V(gg2)$label <- NA
+V(gg2)[bte>=top]$label <- V(gg2)[bte>=top]$name
+V(gg2)$cex <- 1
+V(gg2)[bte>=top]$cex <- 2
 
 png("renren_friend_community_betweenness.png",width=900,height=900)
 par(mar=c(0,0,0,0))
 set.seed(14)
-plot(gg,
+plot(gg2,
 layout=layout.fruchterman.reingold,
-vertex.size=V(gg)$size, vertex.color=V(gg)$color,
-vertex.label=V(gg)$label, vertex.label.cex=V(gg)$cex,
+vertex.size=V(gg2)$size, vertex.color=V(gg2)$color, vertex.frame.color=NA,
+mark.groups=split(seq_len(length(V(gg2))), V(gg2)$sg),
+mark.col=rainbow(max(V(gg2)$sg), alpha=0.3),
+vertex.label=V(gg2)$label, vertex.label.cex=V(gg2)$cex,
 edge.color=grey(0.8)
 )
 dev.off()
-print(V(gg)[bte>=top]$name)
+print(V(gg2)[bte>=top]$name)
 return(list(friend=friend, subgroup=subgroup))
 }
 }
