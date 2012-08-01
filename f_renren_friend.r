@@ -1,4 +1,4 @@
-
+ï»¿
 
 f_renren_friend=function(name="****",pwd="******",N=0){
 
@@ -68,11 +68,11 @@ rm(h)
 
 imax=0
 
-if(length(grep("×îºóÒ³",hh))>0){
-imax=strsplit(hh[grep("×îºóÒ³",hh)[1]],"curpage=")[[1]][2]
+if(length(grep("æœ€åé¡µ",hh))>0){
+imax=strsplit(hh[grep("æœ€åé¡µ",hh)[1]],"curpage=")[[1]][2]
 imax=strsplit(imax,"&amp")[[1]][1]}
-if(length(grep("×îºóÒ³",hh))==0 & length(grep("ÏÂÒ»Ò³",hh))>0){
-nextpage=grep("ÏÂÒ»Ò³",hh)[1]
+if(length(grep("æœ€åé¡µ",hh))==0 & length(grep("ä¸‹ä¸€é¡µ",hh))>0){
+nextpage=grep("ä¸‹ä¸€é¡µ",hh)[1]
 hh2=hh[(nextpage-30):(nextpage-1)]
 lastpage=hh2[max(grep("curpage=",hh2))]
 imax=strsplit(lastpage,"curpage=")[[1]][2]
@@ -80,13 +80,13 @@ imax=strsplit(imax,"&amp")[[1]][1]
 }
 imax=as.numeric(imax)
 
-u0=strsplit(hh[grep("µÄºÃÓÑ</title>",hh)],"µÄºÃÓÑ</title>")[[1]][1]
-u0=strsplit(u0,"ÈËÈËÍø - ")[[1]][2]
+u0=strsplit(hh[grep("çš„å¥½å‹</title>",hh)],"çš„å¥½å‹</title>")[[1]][1]
+u0=strsplit(u0,"äººäººç½‘ - ")[[1]][2]
 
-ii=grep("¼´Ê±ÁÄÌì",hh)
+ii=grep("å³æ—¶èŠå¤©",hh)
 
 if(length(ii)==0){
-hh=hh[grep("´ò¸öÕĞºô",hh)[1]]
+hh=hh[grep("æ‰“ä¸ªæ‹›å‘¼",hh)[1]]
 ff=strsplit(hh,"event,'")[[1]][2]
 ff=strsplit(ff,"'[)]")[[1]][1]
 ff1=strsplit(ff,"','")[[1]][1]
@@ -121,10 +121,10 @@ hh=readLines("temp.txt",encoding="UTF-8")
 # file.remove("temp.txt")
 rm(h)
 
-ii=grep("¼´Ê±ÁÄÌì",hh)
+ii=grep("å³æ—¶èŠå¤©",hh)
 
 if(length(ii)==0){
-hh=hh[grep("´ò¸öÕĞºô",hh)[1]]
+hh=hh[grep("æ‰“ä¸ªæ‹›å‘¼",hh)[1]]
 ff=strsplit(hh,"event,'")[[1]][2]
 ff=strsplit(ff,"'[)]")[[1]][1]
 ff1=strsplit(ff,"','")[[1]][1]

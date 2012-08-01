@@ -1,6 +1,6 @@
+ï»¿
 
-
-# Ö»¿´ÎÒµÄºÃÓÑ
+# åªçœ‹æˆ‘çš„å¥½å‹
 
 f_renren_onlymyfriend <- function(name="******", pwd="******"){
 
@@ -57,14 +57,14 @@ rm(h)
 
 friend <- data.frame(u0=NULL, id0=NULL, u1=NULL, id1=NULL)
 
-# ¶àÉÙÒ³
+# å¤šå°‘é¡µ
 imax <- 0
-if(length(grep("×îºóÒ³", hh)) > 0){
-imax <- strsplit(hh[grep("×îºóÒ³", hh)[1]], "curpage=")[[1]][2]
+if(length(grep("æœ€åé¡µ", hh)) > 0){
+imax <- strsplit(hh[grep("æœ€åé¡µ", hh)[1]], "curpage=")[[1]][2]
 imax <- strsplit(imax, "&amp")[[1]][1]
 }
-if(length(grep("×îºóÒ³", hh)) == 0 & length(grep("ÏÂÒ»Ò³", hh)) > 0){
-nextpage <- grep("ÏÂÒ»Ò³", hh)[1]
+if(length(grep("æœ€åé¡µ", hh)) == 0 & length(grep("ä¸‹ä¸€é¡µ", hh)) > 0){
+nextpage <- grep("ä¸‹ä¸€é¡µ", hh)[1]
 hh_pages <- hh[(nextpage-30) : (nextpage - 1)]
 lastpage <- hh_pages[max(grep("curpage=", hh_pages))]
 imax <- strsplit(lastpage, "curpage=")[[1]][2]
@@ -72,14 +72,14 @@ imax <- strsplit(imax, "&amp")[[1]][1]
 }
 imax <- as.numeric(imax)
 
-# ÎÒµÄÃû×Ö
-u0 <- strsplit(hh[grep("µÄºÃÓÑ</title>", hh)], "µÄºÃÓÑ</title>")[[1]][1]
-u0 <- strsplit(u0, "ÈËÈËÍø - ")[[1]][2]
+# æˆ‘çš„åå­—
+u0 <- strsplit(hh[grep("çš„å¥½å‹</title>", hh)], "çš„å¥½å‹</title>")[[1]][1]
+u0 <- strsplit(u0, "äººäººç½‘ - ")[[1]][2]
 
-# ËÑË÷Ã¿¸öºÃÓÑµÄÃû×Ö¡£Ã¿¸öºÃÓÑ¶¼¿ÉÒÔ¼´Ê±ÁÄÌì¡£Íü¼ÇÎªÊ²Ã´ÁË£¬ÓĞµÄÖ»ÓĞ¡®´ò¸öÕĞºô¡¯
-ii <- grep("¼´Ê±ÁÄÌì", hh)
+# æœç´¢æ¯ä¸ªå¥½å‹çš„åå­—ã€‚æ¯ä¸ªå¥½å‹éƒ½å¯ä»¥å³æ—¶èŠå¤©ã€‚å¿˜è®°ä¸ºä»€ä¹ˆäº†ï¼Œæœ‰çš„åªæœ‰â€˜æ‰“ä¸ªæ‹›å‘¼â€™
+ii <- grep("å³æ—¶èŠå¤©", hh)
 if(length(ii) == 0){
-hh <- hh[grep("´ò¸öÕĞºô", hh)[1]]
+hh <- hh[grep("æ‰“ä¸ªæ‹›å‘¼", hh)[1]]
 ff <- strsplit(hh, "event,'")[[1]][2]
 ff <- strsplit(ff, "'[)]")[[1]][1]
 ff1 <- strsplit(ff, "','")[[1]][1]
@@ -99,7 +99,7 @@ friend <- rbind(friend, friendnew)
 }
 }
 
-# Ò³ÃæÑ­»·
+# é¡µé¢å¾ªç¯
 if(imax >= 1){
 for(pagei in 1:imax){
 thisurl <- paste("http://friend.renren.com/GetFriendList.do?curpage=", pagei, "&id=", uid, sep="")
@@ -109,10 +109,10 @@ hh <- readLines("temp.txt", encoding="UTF-8")
 file.remove("temp.txt")
 rm(h)
 
-# ËÑË÷Ã¿¸öºÃÓÑµÄÃû×Ö¡£Ã¿¸öºÃÓÑ¶¼¿ÉÒÔ¼´Ê±ÁÄÌì¡£Íü¼ÇÎªÊ²Ã´ÁË£¬ÓĞµÄÖ»ÓĞ¡®´ò¸öÕĞºô¡¯
-ii <- grep("¼´Ê±ÁÄÌì", hh)
+# æœç´¢æ¯ä¸ªå¥½å‹çš„åå­—ã€‚æ¯ä¸ªå¥½å‹éƒ½å¯ä»¥å³æ—¶èŠå¤©ã€‚å¿˜è®°ä¸ºä»€ä¹ˆäº†ï¼Œæœ‰çš„åªæœ‰â€˜æ‰“ä¸ªæ‹›å‘¼â€™
+ii <- grep("å³æ—¶èŠå¤©", hh)
 if(length(ii) == 0){
-hh <- hh[grep("´ò¸öÕĞºô", hh)[1]]
+hh <- hh[grep("æ‰“ä¸ªæ‹›å‘¼", hh)[1]]
 ff <- strsplit(hh, "event,'")[[1]][2]
 ff <- strsplit(ff, "'[)]")[[1]][1]
 ff1 <- strsplit(ff, "','")[[1]][1]
@@ -134,15 +134,15 @@ friend <- rbind(friend, friendnew)
 }
 }
 
-# ÎÒµÄÃû×ÖºÍID
+# æˆ‘çš„åå­—å’ŒID
 friend$u0 <- u0
 friend$id0 <- uid
 
-# Èç¹ûÎÒÃ»ÓĞºÃÓÑ ="=
+# å¦‚æœæˆ‘æ²¡æœ‰å¥½å‹ ="=
 if(nrow(friend) <= 0){
 frienddata <- friend
 }
-# Èç¹ûÎÒÓĞºÃÓÑ
+# å¦‚æœæˆ‘æœ‰å¥½å‹
 if(nrow(friend) > 0){
 friend <- unique(friend)
 rownames(friend) <- 1:nrow(friend)
@@ -152,7 +152,7 @@ for(i in 1:4){
 frienddata[, i] <- as.character(frienddata[, i])
 }
 
-# Ñ­»·²éÕÒ¹²Í¬ºÃÓÑ
+# å¾ªç¯æŸ¥æ‰¾å…±åŒå¥½å‹
 for(num in 1:nrow(friend)){
 userid <- friend$id1[num]
 username <- friend$u1[num]
@@ -173,16 +173,16 @@ print(paste('no shareFriends with ', username, sep=''))
 }
 }
 
-# ±¸·İºÃÓÑÊı¾İ
+# å¤‡ä»½å¥½å‹æ•°æ®
 friend <- frienddata
 
 frienddata[, 2] <- as.character(frienddata[, 2])
 frienddata[, 4] <- as.character(frienddata[, 4])
 
-# ÎÒµÄºÃÓÑ
+# æˆ‘çš„å¥½å‹
 myfrienddata <- frienddata[frienddata[, 2] == uid, ]
 
-# ÅÅ³ı×¢ÏúµÄÕËºÅ¼°Ã»ÓĞ¹²Í¬ºÃÓÑµÄÇé¿ö
+# æ’é™¤æ³¨é”€çš„è´¦å·åŠæ²¡æœ‰å…±åŒå¥½å‹çš„æƒ…å†µ
 frienddata_gg <- frienddata[frienddata[, 4] %in% myfrienddata[, 4] & frienddata[, 2] != uid, c(2, 4)]
 # myfrienddata <- myfrienddata[myfrienddata[, 4] %in% c(frienddata_gg[, 1], frienddata_gg[, 2]), ]
 
@@ -197,13 +197,13 @@ is.simple(gg1)
 dg <- degree(gg1)
 gg2 <- induced.subgraph(gg1, which(dg > 0))
 
-# ×ÓÈº»®·Ö
+# å­ç¾¤åˆ’åˆ†
 com <- walktrap.community(gg2, steps=5)
 # plot(com, gg2)
 subgroup <- split(com$names, com$membership)
 V(gg2)$sg <- com$membership
 V(gg2)$color <- rainbow(max(V(gg2)$sg), alpha=0.75)[V(gg2)$sg]
-# ÖĞ¼ä¶È
+# ä¸­é—´åº¦
 V(gg2)$bte <- betweenness(gg2, directed=F)
 top <- quantile(V(gg2)$bte,0.99)
 V(gg2)$size <- 5

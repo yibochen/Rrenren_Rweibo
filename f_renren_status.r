@@ -1,5 +1,5 @@
-
-# µÇÂ¼
+ï»¿
+# ç™»å½•
 f_renren_login <- function(name="****", pwd="****"){
 memory.limit(4000)
 require(RCurl)
@@ -36,8 +36,8 @@ return(cH)
 }
 
 
-# »ñÈ¡×´Ì¬
-f_renren_status <- function(cH=ch0, N=200, readlist=F, hisname='³ÂÒİ²¨'){
+# è·å–çŠ¶æ€
+f_renren_status <- function(cH=ch0, N=200, readlist=F, hisname='é™ˆé€¸æ³¢'){
 memory.limit(4000)
 require(RCurl)
 
@@ -56,7 +56,7 @@ uid <- hh2
 # uid
 # "41021031"
 
-# ÏÈ×öÃû×ÖºÍIDµÄ¶ÔÓ¦±í
+# å…ˆåšåå­—å’ŒIDçš„å¯¹åº”è¡¨
 thisurl <- paste("http://friend.renren.com/GetFriendList.do?curpage=0&id=", uid, sep="")
 h <- getURL(thisurl, curl=cH, .encoding="gbk")
 write(h, "temp.txt")
@@ -66,14 +66,14 @@ rm(h)
 
 friend <- data.frame(u1=NULL, id1=NULL)
 
-# ¶àÉÙÒ³
+# å¤šå°‘é¡µ
 imax <- 0
-if(length(grep("×îºóÒ³", hh)) > 0){
-imax <- strsplit(hh[grep("×îºóÒ³", hh)[1]], "curpage=")[[1]][2]
+if(length(grep("æœ€åé¡µ", hh)) > 0){
+imax <- strsplit(hh[grep("æœ€åé¡µ", hh)[1]], "curpage=")[[1]][2]
 imax <- strsplit(imax, "&amp")[[1]][1]
 }
-if(length(grep("×îºóÒ³", hh)) == 0 & length(grep("ÏÂÒ»Ò³", hh)) > 0){
-nextpage <- grep("ÏÂÒ»Ò³", hh)[1]
+if(length(grep("æœ€åé¡µ", hh)) == 0 & length(grep("ä¸‹ä¸€é¡µ", hh)) > 0){
+nextpage <- grep("ä¸‹ä¸€é¡µ", hh)[1]
 hh_pages <- hh[(nextpage-30) : (nextpage - 1)]
 lastpage <- hh_pages[max(grep("curpage=", hh_pages))]
 imax <- strsplit(lastpage, "curpage=")[[1]][2]
@@ -81,14 +81,14 @@ imax <- strsplit(imax, "&amp")[[1]][1]
 }
 imax <- as.numeric(imax)
 
-# ÎÒµÄÃû×Ö
-u0 <- strsplit(hh[grep("µÄºÃÓÑ</title>", hh)], "µÄºÃÓÑ</title>")[[1]][1]
-u0 <- strsplit(u0, "ÈËÈËÍø - ")[[1]][2]
+# æˆ‘çš„åå­—
+u0 <- strsplit(hh[grep("çš„å¥½å‹</title>", hh)], "çš„å¥½å‹</title>")[[1]][1]
+u0 <- strsplit(u0, "äººäººç½‘ - ")[[1]][2]
 
-# ËÑË÷Ã¿¸öºÃÓÑµÄÃû×Ö¡£Ã¿¸öºÃÓÑ¶¼¿ÉÒÔ¼´Ê±ÁÄÌì¡£Íü¼ÇÎªÊ²Ã´ÁË£¬ÓĞµÄÖ»ÓĞ¡®´ò¸öÕĞºô¡¯
-ii <- grep("¼´Ê±ÁÄÌì", hh)
+# æœç´¢æ¯ä¸ªå¥½å‹çš„åå­—ã€‚æ¯ä¸ªå¥½å‹éƒ½å¯ä»¥å³æ—¶èŠå¤©ã€‚å¿˜è®°ä¸ºä»€ä¹ˆäº†ï¼Œæœ‰çš„åªæœ‰â€˜æ‰“ä¸ªæ‹›å‘¼â€™
+ii <- grep("å³æ—¶èŠå¤©", hh)
 if(length(ii) == 0){
-hh <- hh[grep("´ò¸öÕĞºô", hh)[1]]
+hh <- hh[grep("æ‰“ä¸ªæ‹›å‘¼", hh)[1]]
 ff <- strsplit(hh, "event,'")[[1]][2]
 ff <- strsplit(ff, "'[)]")[[1]][1]
 ff1 <- strsplit(ff, "','")[[1]][1]
@@ -108,7 +108,7 @@ friend <- rbind(friend, friendnew)
 }
 }
 
-# Ò³ÃæÑ­»·
+# é¡µé¢å¾ªç¯
 if(imax >= 1){
 for(pagei in 1:imax){
 thisurl <- paste("http://friend.renren.com/GetFriendList.do?curpage=", pagei, "&id=", uid, sep="")
@@ -118,10 +118,10 @@ hh <- readLines("temp.txt", encoding="UTF-8")
 file.remove("temp.txt")
 rm(h)
 
-# ËÑË÷Ã¿¸öºÃÓÑµÄÃû×Ö¡£Ã¿¸öºÃÓÑ¶¼¿ÉÒÔ¼´Ê±ÁÄÌì¡£Íü¼ÇÎªÊ²Ã´ÁË£¬ÓĞµÄÖ»ÓĞ¡®´ò¸öÕĞºô¡¯
-ii <- grep("¼´Ê±ÁÄÌì", hh)
+# æœç´¢æ¯ä¸ªå¥½å‹çš„åå­—ã€‚æ¯ä¸ªå¥½å‹éƒ½å¯ä»¥å³æ—¶èŠå¤©ã€‚å¿˜è®°ä¸ºä»€ä¹ˆäº†ï¼Œæœ‰çš„åªæœ‰â€˜æ‰“ä¸ªæ‹›å‘¼â€™
+ii <- grep("å³æ—¶èŠå¤©", hh)
 if(length(ii) == 0){
-hh <- hh[grep("´ò¸öÕĞºô", hh)[1]]
+hh <- hh[grep("æ‰“ä¸ªæ‹›å‘¼", hh)[1]]
 ff <- strsplit(hh, "event,'")[[1]][2]
 ff <- strsplit(ff, "'[)]")[[1]][1]
 ff1 <- strsplit(ff, "','")[[1]][1]
@@ -142,7 +142,7 @@ friend <- rbind(friend, friendnew)
 }
 }
 }
-# ÎÒµÄÃû×ÖºÍID
+# æˆ‘çš„åå­—å’ŒID
 friend <- rbind(friend, data.frame(u1=u0, id1=uid))
 }
 hisid <- as.character(friend$id1[friend$u1 == hisname])
@@ -199,50 +199,50 @@ return(h_status)
 }
 
 
-# ÁÁ¸çÖ¸µ¼ÎÒ¿ÉÒÔÓÃ¸öÈË´ÊÆµÓë¹«¹²´ÊÆµ×ö±È½Ï£¬À´É¸Ñ¡¹Ø¼ü´Ê¡£ËùÒÔÎÒÓÖ×öÁËÉú³É´ÊÔÆµÄº¯Êı¡£
-f_renren_wordcloud <- function(renren_data=status_1000_0, hisname='³ÂÒİ²¨'){
+# äº®å“¥æŒ‡å¯¼æˆ‘å¯ä»¥ç”¨ä¸ªäººè¯é¢‘ä¸å…¬å…±è¯é¢‘åšæ¯”è¾ƒï¼Œæ¥ç­›é€‰å…³é”®è¯ã€‚æ‰€ä»¥æˆ‘åˆåšäº†ç”Ÿæˆè¯äº‘çš„å‡½æ•°ã€‚
+f_renren_wordcloud <- function(renren_data=status_1000_0, hisname='é™ˆé€¸æ³¢'){
 require(wordcloud)
 require(rmmseg4j)
 
-# È¥µô×ª·¢µÄÒıÓÃÄÚÈİ
+# å»æ‰è½¬å‘çš„å¼•ç”¨å†…å®¹
 getexpr2 <- function(str, greg){
 substring(str, 1, greg[1]-1)
 }
-h_exp1 <- grep('×ª×Ô', renren_data, value=T, invert=T)
-h_exp2 <- grep('×ª×Ô', renren_data, value=T, invert=F)
-h_exp3 <- mapply(getexpr2, h_exp2, gregexpr('×ª×Ô', h_exp2))
+h_exp1 <- grep('è½¬è‡ª', renren_data, value=T, invert=T)
+h_exp2 <- grep('è½¬è‡ª', renren_data, value=T, invert=F)
+h_exp3 <- mapply(getexpr2, h_exp2, gregexpr('è½¬è‡ª', h_exp2))
 renren_data <- c(h_exp1, h_exp3)
 names(renren_data) <- NULL
-# È¥µô±íÇé¼°·ÇÖĞÎÄ×Ö·û
+# å»æ‰è¡¨æƒ…åŠéä¸­æ–‡å­—ç¬¦
 renren_data <- gsub(' alt=\'[^\']+\'', '', renren_data)
-renren_data <- gsub('[^\u4e00-\u9fff £¬¡£]', '', renren_data)
+renren_data <- gsub('[^\u4e00-\u9fff ï¼Œã€‚]', '', renren_data)
 
-# ·Ö´Ê
+# åˆ†è¯
 f_cut <- function(x){
 unlist(strsplit(mmseg4j(x), ' '))
 }
 words <- unlist(mapply(f_cut, renren_data))
 names(words) <- NULL
 
-# Í³¼Æ´ÊÆµ
+# ç»Ÿè®¡è¯é¢‘
 words_freq <- sort(table(words), dec=T)
 words_names <- names(words_freq)
 words_length <- nchar(words_names)
 
-# ¼ÓÔØËÑ¹·ÊµÑéÊÒµÄ´ÊÆµÎÄ¼ş
+# åŠ è½½æœç‹—å®éªŒå®¤çš„è¯é¢‘æ–‡ä»¶
 SogouLabDic <- read.table('SogouLabDic.dic', fill=T, head=F)
 names(SogouLabDic)[1] <- 'words_names'
 
 words_df <- data.frame(words_names=words_names, words_freq=words_freq, words_length=words_length)
-# Ö»×öÁ½Èı¸ö×ÖµÄ´Ê£¬¼òµ¥Ò»µã¡£¡£¡£
+# åªåšä¸¤ä¸‰ä¸ªå­—çš„è¯ï¼Œç®€å•ä¸€ç‚¹ã€‚ã€‚ã€‚
 words_df <- words_df[words_df$words_length %in% c(2,3), ]
 SogouLabDic0 <- SogouLabDic[SogouLabDic[,1] %in% words_df$words_names, ]
 
 words_df2 <- merge (words_df, SogouLabDic0, by='words_names', all.x=T)
-# ¿ÉÒÔÉ¸Ñ¡Ãû´ÊºÍ¶¯´Ê¡£²»¹ıËÆºõÃ»ÓĞ±ØÒª£¬ÒòÎªĞÎÈİ´Ê¸±´ÊÊ²Ã´µÄÒ²ÄÜ¹»ÌåÏÖÓÃ´Ê·ç¸ñÂï
+# å¯ä»¥ç­›é€‰åè¯å’ŒåŠ¨è¯ã€‚ä¸è¿‡ä¼¼ä¹æ²¡æœ‰å¿…è¦ï¼Œå› ä¸ºå½¢å®¹è¯å‰¯è¯ä»€ä¹ˆçš„ä¹Ÿèƒ½å¤Ÿä½“ç°ç”¨è¯é£æ ¼å˜›
 words_df2 <- words_df2[grep('^[NV],$',words_df2$V3), ]
 
-# Æ¥Åä²»µ½µÄÈÓµô
+# åŒ¹é…ä¸åˆ°çš„æ‰”æ‰
 words_df3 <- words_df2[!is.na(words_df2$V2), ]
 words_df3$words_freq2 <- words_df3$words_freq * log(max(words_df3$V2)/words_df3$V2)
 
@@ -253,7 +253,7 @@ wd_freq2 <- words_df3$words_freq2
 freq_median <- median(wd_freq2)
 freq_beta <- max(wd_freq2)/min(wd_freq2)
 
-# ×ö´ÊÔÆ£¨Õâ¸ö°üÃ²ËÆ¶ÔÖĞÎÄÖ§³Ö²»ÊÇºÜºÃ£©
+# åšè¯äº‘ï¼ˆè¿™ä¸ªåŒ…è²Œä¼¼å¯¹ä¸­æ–‡æ”¯æŒä¸æ˜¯å¾ˆå¥½ï¼‰
 png(paste('renren_wordcloud_', Sys.Date(), '_', hisname, '.png', sep=''),width=500,height=500)
 par(mar=c(0,0,0,0))
 wordcloud(words_df3$words_names, words_df3$words_freq2, min.freq=0,
