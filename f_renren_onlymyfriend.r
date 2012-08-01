@@ -219,8 +219,8 @@ set.seed(14)
 plot(gg2,
 layout=layout.fruchterman.reingold,
 vertex.size=V(gg2)$size, vertex.color=V(gg2)$color, vertex.frame.color=NA,
-mark.groups=split(seq_len(length(V(gg2))), V(gg2)$sg),
-mark.col=rainbow(max(V(gg2)$sg), alpha=0.3),
+# mark.groups=split(seq_len(length(V(gg2))), V(gg2)$sg),
+# mark.col=rainbow(max(V(gg2)$sg), alpha=0.3),
 vertex.label=V(gg2)$label, vertex.label.cex=V(gg2)$cex,
 edge.color=grey(0.8)
 )
