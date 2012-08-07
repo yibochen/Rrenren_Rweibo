@@ -1,4 +1,4 @@
-﻿
+
 # 登录
 f_renren_login <- function(name="****", pwd="****"){
 memory.limit(4000)

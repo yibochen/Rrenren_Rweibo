@@ -1,4 +1,4 @@
-﻿
+
 
 f_renren_friend=function(name="****",pwd="******",N=0){
 
