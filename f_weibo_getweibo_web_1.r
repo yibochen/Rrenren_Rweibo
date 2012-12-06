@@ -1,4 +1,4 @@
-﻿
+
 
 # 首先还是微博登录的函数：
 f_weibo_login <- function(name="****", pwd="****"){
@@ -84,7 +84,7 @@ f_weibo_get <- function(cH=ch0, N=200, hisnick='chenyibo'){
   # 参数N是想要获取的微博条数。参数hisnick是对方的ID
   try(memory.limit(4000), silent=T)
   require(RCurl)
-  require(rjson)
+  require(RJSONIO)
   
   # 先看一下有多少页
   pg=1
@@ -126,7 +126,7 @@ f_weibo_get <- function(cH=ch0, N=200, hisnick='chenyibo'){
     }
     a1 <- gsub('<script>STK && STK.pageletM && STK.pageletM.view\\(','',the1get[myfeedi])
     a1 <- gsub('\\)</script>','',a1)
-    a1 <- fromJSON(a1)$html
+    a1 <- fromJSON(a1)[['html']]
     write(a1, 'a1.txt')
     a1 <- readLines("a1.txt")
     
@@ -139,9 +139,9 @@ f_weibo_get <- function(cH=ch0, N=200, hisnick='chenyibo'){
     the2url <- paste('http://weibo.com/aj/mblog/mbloglist?page=', pg, 
                      '&count=15&max_id=', lastmid, '&pre_page=', pg, '&end_id=&pagebar=0&uid=', oid, sep='')
     the2get <- getURL(the2url, curl=cH, .encoding="UTF-8")
-    write(the2get, "temp.txt")
-    the2get <- readLines("temp.txt")
-    a2 <- fromJSON(the2get)$data
+    # write(the2get, "temp.txt")
+    # the2get <- readLines("temp.txt")
+    a2 <- fromJSON(the2get)[['data']]
     write(a2, 'a2.txt')
     a2 <- readLines("a2.txt")
     
@@ -154,9 +154,9 @@ f_weibo_get <- function(cH=ch0, N=200, hisnick='chenyibo'){
     the3url <- paste('http://weibo.com/aj/mblog/mbloglist?page=', pg, 
                      '&count=15&max_id=', lastmid, '&pre_page=', pg, '&end_id=&pagebar=1&uid=', oid, sep='')
     the3get <- getURL(the3url, curl=cH, .encoding="UTF-8")
-    write(the3get, "temp.txt")
-    the3get <- readLines("temp.txt")
-    a3 <- fromJSON(the3get)$data
+    # write(the3get, "temp.txt")
+    # the3get <- readLines("temp.txt")
+    a3 <- fromJSON(the3get)[['data']]
     write(a3, 'a3.txt')
     a3 <- readLines("a3.txt")
     
@@ -177,59 +177,10 @@ f_weibo_get <- function(cH=ch0, N=200, hisnick='chenyibo'){
   file.remove("temp.txt")
   
   # 去掉英文和数字，去掉@对象
-  weibo_data <- gsub(' @[^ ]* ', '', weibo_data)
-  weibo_data <- gsub('[0-9a-zA-Z]+', '', weibo_data)
-  
-  return(weibo_data[1:min(as.numeric(number), N)])
-}
-
-
-# 亮哥指导我可以用个人词频与公共词频做比较，来筛选关键词。所以我又做了生成词云的函数。
-f_weibo_wordcloud <- function(weibo_data=weibo_10000_0, hisnick='chenyibo'){
-  require(wordcloud)
-  
-  # 分词
-  require(rmmseg4j)
-  f_cut <- function(x){
-    unlist(strsplit(mmseg4j(x, reload=T), ' '))
-  }
-  words <- unlist(mapply(f_cut, weibo_data))
-  words <- words[words != 'na']
-  words <- words[words != '转发']
-  names(words) <- NULL
-  
-  # 统计词频
-  words_freq <- sort(table(words), dec=T)
-  words_names <- names(words_freq)
-  words_length <- nchar(words_names)
-  
-  # 加载搜狗实验室的词频文件
-  SogouLabDic <- read.table('SogouLabDic.dic', fill=T, head=F)
-  
-  words_df <- data.frame(words_names=words_names, words_freq=words_freq, words_length=words_length)
-  # 只做两三个字的词，简单一点。。。
-  words_df <- words_df[words_df$words_length %in% c(2,3), ]
-  names(SogouLabDic)[1] <- 'words_names'
-  SogouLabDic <- SogouLabDic[SogouLabDic[,1] %in% words_df$words_names, ]
-  
-  words_df2 <- merge (words_df, SogouLabDic, by='words_names', all.x=T)
-  # 可以筛选名词和动词。不过似乎没有必要，因为形容词副词什么的也能够体现用词风格嘛
-  words_df2 <- words_df2[grep('^[NV],$',words_df2$V3), ]
-  
-  # 匹配不到的扔掉
-  words_df3 <- words_df2[!is.na(words_df2$V2), ]
-  words_df3$words_freq2 <- words_df3$words_freq * log(max(words_df3$V2)/words_df3$V2)
-  
-  words_df3 <- words_df3[order(-words_df3$words_freq2), ][1:50, ]
-  # words_df3$words_rank <- ceiling(rank(words_df3$words_freq2))
-  # words_df3$words_rank <- ceiling(words_df3$words_rank*50/max(words_df3$words_rank))
-  
-  # 做词云（这个包貌似对中文支持不是很好）
-  png(paste('weibo_wordcloud_', Sys.Date(), '_', hisnick, '.png', sep=''),width=500,height=500)
-  par(mar=c(0,0,0,0))
-  wordcloud(words_df3$words_names, words_df3$words_freq2, min.freq=0,
-            scale=c(6+(max(words_df3$words_freq2)/min(words_df3$words_freq2)-3.8)*0.65,1), 
-            max.words=50, random.order=F, colors=terrain.colors(50,1))
-  dev.off()
+  # weibo_data <- gsub('@[^ ]+ ', '', weibo_data)
+  # weibo_data <- gsub('[0-9a-zA-Z]+', '', weibo_data)
+  weibo_data <- weibo_data[1:min(as.numeric(number), N)]
+  weibo_data <- weibo_data[!is.na(weibo_data)]
+  return(weibo_data)
 }
 
