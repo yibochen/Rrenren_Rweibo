@@ -15,7 +15,7 @@ weibo_10000_0 <- f_weibo_get(cH=ch0, N=10000, hisnick='chenyibo')
 
 save(weibo_10000_0, file='weibo_saved.RData')
 
-require(wordcloud)
+load('weibo_saved.RData')
 
 # 分词
 require(rmmseg4j)
@@ -55,6 +55,7 @@ words_df4 <- words_df3[order(-words_df3$words_freq2), ][1:100, ]
 # words_df3$words_rank <- ceiling(words_df3$words_rank*50/max(words_df3$words_rank))
 
 # 做词云（这个包貌似对中文支持不是很好）
+require(wordcloud)
 png(paste('weibo_wordcloud_', Sys.Date(), '_', hisnick, '.png', sep=''),width=500,height=500)
 par(mar=c(0,0,0,0))
 wordcloud(words_df3$words_names, words_df3$words_freq2, min.freq=0, scale=c(6,1), 
