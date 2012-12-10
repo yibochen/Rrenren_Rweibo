@@ -53,12 +53,14 @@ f_weibo_login <- function(name='****', pwd='****'){
   # 登录
   bkp_ctype <- Sys.getlocale('LC_CTYPE')
   if(bkp_ctype == 'zh_CN.UTF-8'){Sys.setlocale('LC_CTYPE', 'C')}
-  ttt <- postForm('http://login.sina.com.cn/sso/login.php?client=ssologin.js(v1.3.18)', 
-                  .params=pinfo, curl=cH, style='post')
+  x <- try(ttt <- postForm('http://login.sina.com.cn/sso/login.php?client=ssologin.js(v1.3.18)', 
+                           .params=pinfo, curl=cH, style='post'), silent=T)
+  if(class(x) == 'try-error'){cat('no!!!!!!');return(NULL)}
   newurl <- gsub('^.*location.replace\\(\'(.+)\'\\);.*$', '\\1', ttt[1])
-  x <- getURL(newurl, curl=cH, .encoding='UTF-8')
-  getCurlInfo(cH)[['cookielist']]
+  x <- try(x <- getURL(newurl, curl=cH, .encoding='UTF-8'), silent=T)
   Sys.setlocale('LC_CTYPE', bkp_ctype)
+  if(class(x) == 'try-error'){cat('no!!!!!!');return(NULL)}
+  getCurlInfo(cH)[['cookielist']]
   return(cH)
 }
 
