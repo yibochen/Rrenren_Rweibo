@@ -2,10 +2,16 @@
 
 # 首先还是微博登录的函数：
 f_weibo_login <- function(name='****', pwd='****'){
-  try(memory.limit(4000), silent=T)
+  # 根据操作系统选择加载包
+  sysname <- Sys.info()['sysname']
+  if(length(grep('Windows', sysname)) == 1){
+    try(memory.limit(4000), silent=T)
+    require(RJSONIO)
+  } else{
+    require(rjson)
+  }
   require(RCurl)
   require(digest)
-  require(RJSONIO)
   
   # 对ID的预处理
   name1 <- URLencode(name, reserved=T)

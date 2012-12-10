@@ -3,9 +3,15 @@
 # 然后是抓取数据的函数。目前只写了feeds部分的抓取，其他是类似的，而且会更简单一点，不需要刷新页面。
 f_weibo_get <- function(cH=ch0, N=200, hisnick='chenyibo'){
   # 参数N是想要获取的微博条数。参数hisnick是对方的ID
-  try(memory.limit(4000), silent=T)
+  # 根据操作系统选择加载包
+  sysname <- Sys.info()['sysname']
+  if(length(grep('Windows', sysname)) == 1){
+    try(memory.limit(4000), silent=T)
+    require(RJSONIO)
+  } else{
+    require(rjson)
+  }
   require(RCurl)
-  require(RJSONIO)
   require(XML)
   
   # 先看一下有多少页
@@ -22,15 +28,19 @@ f_weibo_get <- function(cH=ch0, N=200, hisnick='chenyibo'){
   for (pg in seq_len(pages)){
     # 第一屏
     the1url <- paste('http://weibo.com/', hisnick, '/profile?page=', pg, sep='')
-    the1get <- getURL(the1url, curl=cH, .encoding="UTF-8")
+    the1get <- getURL(the1url, curl=cH, .encoding='UTF-8')
     # 看别人的时候是hisFeed，看自己的时候是myFeed(后面的url也略有差异，主要是刷新的时候需要用到uid)
-    myfeed <- paste('^.*<script>STK && STK.pageletM && STK.pageletM.view\\\\((\\{', 
+    myfeed <- paste('^.*<script>STK && STK.pageletM && STK.pageletM.view\\((\\{', 
                     ifelse(uid == oid, '\"pid\":\"pl_content_myFeed\"', '\"pid\":\"pl_content_hisFeed\"'), 
-                    '.+\\})\\\\)</script>.*$', sep='')
-    a1 <- gsub('^.*<script>STK && STK.pageletM && STK.pageletM.view\\((\\{\"pid\":\"pl_content_myFeed\".+?\\})\\)</script>.*$', '\\1', the1get)
+                    '.+?\\})\\)</script>.*$', sep='')
+    a1 <- gsub(myfeed, '\\1', the1get)
     a1 <- fromJSON(a1)[['html']]
     # 最后一条微博的ID
-    lastmid <- gsub('^.*mid=\"([0-9]+)\".*$', '\\1', a1)
+    if(length(grep('mid=\"([0-9]+)\"', a1)) > 0){
+      lastmid <- gsub('^.*mid=\"([0-9]+)\".*$', '\\1', a1)
+    } else{
+      lastmid <- ''
+    }
     
     # 于是第二屏
     the2url <- paste('http://weibo.com/aj/mblog/mbloglist?page=', pg, 
@@ -38,7 +48,11 @@ f_weibo_get <- function(cH=ch0, N=200, hisnick='chenyibo'){
     the2get <- getURL(the2url, curl=cH, .encoding='UTF-8')
     a2 <- fromJSON(the2get)[['data']]
     # 最后一条微博的ID
-    lastmid <- gsub('^.*mid=\"([0-9]+)\".*$', '\\1', a2)
+    if(length(grep('mid=\"([0-9]+)\"', a2)) > 0){
+      lastmid <- gsub('^.*mid=\"([0-9]+)\".*$', '\\1', a2)
+    } else{
+      lastmid <- ''
+    }
     
     # 于是第三屏
     the3url <- paste('http://weibo.com/aj/mblog/mbloglist?page=', pg, 
