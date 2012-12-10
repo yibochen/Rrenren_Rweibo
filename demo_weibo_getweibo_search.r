@@ -1,6 +1,5 @@
 
 
-
 source('f_weibo_getweibo_search.r')
 
 # 登录
@@ -43,7 +42,4 @@ summary(col_sums(dtm))
 tp <- LDA(dtm2, k=3, control=list(seed=2012))
 topic <- topics(tp, 1)
 term <- terms(tp, 10)
-
-
-
 
