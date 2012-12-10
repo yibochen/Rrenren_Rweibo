@@ -5,7 +5,7 @@ f_weibo_login <- function(name='****', pwd='****'){
   try(memory.limit(4000), silent=T)
   require(RCurl)
   require(digest)
-  require(RJSONIO)
+  require(rjson)
   
   # 对ID的预处理
   name1 <- URLencode(name, reserved=T)
