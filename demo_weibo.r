@@ -1,12 +1,12 @@
 
 
-source('f_weibo_getweibo_content.r')
-
 # 登录
+source('f_weibo_login.r')
 ch0 <- f_weibo_login('myemail', 'mypwd')
 # ch1 <- f_weibo_login('myemail2', 'mypwd2')
 
 # 获取微博数据（这里只做了我自己的版本，10000是个足够大的数字）
+source('f_weibo_get.r')
 weibo_10000_0 <- f_weibo_get(cH=ch0, N=10000, hisnick='chenyibo')
 # weibo_10000_1 <- f_weibo_get(cH=ch1, N=10000, hisnick='chenyibo')
 # 这两个结果有一点点点差异，目前看来，貌似是显示给自己的微博比较全。

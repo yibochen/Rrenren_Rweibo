@@ -1,15 +1,14 @@
 
 
-source('f_weibo_getweibo_search.r')
-
 # 登录
+source('f_weibo_login.r')
 ch0 <- f_weibo_login('myemail', 'mypwd')
 
 # 获取微博搜索数据
-weibo_0 <- f_weibo_get(cH=ch0, mykeyword='华院数云')
+source('f_weibo_search.r')
+weibo_0 <- f_weibo_search(cH=ch0, mykeyword='华院数云')
 
 save(weibo_0, file='weibo_saved.RData')
-
 
 sort(table(weibo_0$nickname), dec=T)[1:20]
 
