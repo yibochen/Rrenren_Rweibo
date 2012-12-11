@@ -9,7 +9,7 @@ f_weibo_get <- function(cH=ch0, N=200, hisnick='chenyibo'){
     try(memory.limit(4000), silent=T)
     require(RJSONIO)
   } else{
-    require(RJSONIO)
+    require(rjson)
   }
   require(RCurl)
   require(XML)
