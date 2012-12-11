@@ -8,7 +8,7 @@ f_weibo_login <- function(name='****', pwd='****'){
     try(memory.limit(4000), silent=T)
     require(RJSONIO)
   } else{
-    require(rjson)
+    require(RJSONIO)
   }
   require(RCurl)
   require(digest)
