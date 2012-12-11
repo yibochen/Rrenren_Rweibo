@@ -3,15 +3,9 @@
 # 然后是抓取数据的函数。目前只写了feeds部分的抓取，其他是类似的，而且会更简单一点，不需要刷新页面。
 f_weibo_get <- function(cH=ch0, N=200, hisnick='chenyibo'){
   # 参数N是想要获取的微博条数。参数hisnick是对方的ID
-  # 根据操作系统选择加载包
-  sysname <- Sys.info()['sysname']
-  if(length(grep('Windows', sysname)) == 1){
-    try(memory.limit(4000), silent=T)
-    require(RJSONIO)
-  } else{
-    require(rjson)
-  }
+  try(memory.limit(4000), silent=T)
   require(RCurl)
+  require(rjson)
   require(XML)
   
   # 先看一下有多少页
