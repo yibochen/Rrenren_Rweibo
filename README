@@ -1,7 +1,8 @@
 
 关于校内和微博的一些函数扔在这里。目前函数较少，没有打包的计划，通过source调用。
 
-校内的脚本用于这篇文章：http://cos.name/2011/04/exploring-renren-social-network，但时过境迁，目前似乎不能用了。暂时没有时间改。
+校内的脚本用于这篇文章：http://cos.name/2011/04/exploring-renren-social-network
+但时过境迁，目前似乎不能用了。暂时没有时间改。
 
 微博的脚本目前实现抓取feeds的功能，demo中有一个分析关键词的例子。
 之前实现过微博的搜索功能，目前待修改。
