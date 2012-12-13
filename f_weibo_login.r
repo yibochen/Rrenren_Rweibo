@@ -1,6 +1,6 @@
 
 
-# 首先还是微博登录的函数：
+# 微博登录的函数
 f_weibo_login <- function(name='****', pwd='****'){
   # 根据操作系统选择加载包
   sysname <- Sys.info()['sysname']

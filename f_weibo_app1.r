@@ -1,7 +1,7 @@
 
 
 # 微博关键词及时间分布
-f_weibo_app1 <- function(hisnick='chenyibo'){
+f_weibo_app1 <- function(hisnick='chenyibo', scale_a=7, scale_b=1){
   load(paste('weibo_saved_', hisnick, '.RData', sep=''))
   
   # 分词
@@ -57,7 +57,7 @@ f_weibo_app1 <- function(hisnick='chenyibo'){
   hist(weibo_time, breaks='months', 
        main=paste('TA的微博是不是越发越勤快？', sep=''), 
        col=rgb(0,0.5,1), border=rgb(0,0.5,1), xlab=NULL, ylab=NULL)
-  wordcloud(words_df3$words_names, words_df3$words_freq2, min.freq=0, scale=c(7,1), 
+  wordcloud(words_df3$words_names, words_df3$words_freq2, min.freq=0, scale=c(scale_a, scale_b), 
             max.words=100, random.order=F, colors=rainbow(100,start=0.5,end=1), rot.per=0)
   plot(0, 0, type='n', xlim=c(0,100), ylim=c(0,100), axes=F)
   text(50, 50, paste(weibo_get$hisnick, weibo_get$nick, sep='\n'), 

@@ -1,8 +1,10 @@
 
 
-# 然后是抓取数据的函数。目前只写了feeds部分的抓取，其他是类似的，而且会更简单一点，不需要刷新页面。
-f_weibo_get <- function(cH=ch0, N=200, hisnick='chenyibo'){
-  # 参数N是想要获取的微博条数。参数hisnick是对方的ID
+# 抓取数据的函数。目前只写了feeds部分的抓取，其他是类似的，而且会更简单一点，不需要刷新页面。
+f_weibo_get <- function(cH=ch0, N=200, hisnick='chenyibo', is_e=F){
+  # N       想要获取的微博条数
+  # hisnick 对方的ID
+  # is_e    是否企业版
   # 根据操作系统选择加载包
   sysname <- Sys.info()['sysname']
   if(length(grep('Windows', sysname)) == 1){
@@ -20,8 +22,13 @@ f_weibo_get <- function(cH=ch0, N=200, hisnick='chenyibo'){
   the1get <- getURL(the1url, curl=cH, .encoding='UTF-8')
   oid <- gsub('^.*\\[\'oid\'\\] = \'([^\']+)\';.*$', '\\1', the1get)
   uid <- gsub('^.*\\[\'uid\'\\] = \'([^\']+)\';.*$', '\\1', the1get)
-  onick <- gsub('^.*\\[\'onick\'\\] = \'([^\']+)\';.*$', '\\1', the1get)
-  number <- gsub('^.*<strong node-type=\\\\"weibo\\\\">([0-9]+)<\\\\/strong>.*$', '\\1', the1get)
+  if(is_e){
+    onick <- gsub('^.*\\[\'onick\'\\] = \"([^\']+)\";.*$', '\\1', the1get)
+    number <- gsub('^.*<strong>([0-9]+)</strong><span>微博.*$', '\\1', the1get)
+  } else{
+    onick <- gsub('^.*\\[\'onick\'\\] = \'([^\']+)\';.*$', '\\1', the1get)
+    number <- gsub('^.*<strong node-type=\\\\"weibo\\\\">([0-9]+)<\\\\/strong>.*$', '\\1', the1get)
+  }
   cnt <- min(as.numeric(number), N)
   # pages <- ceiling(min(as.numeric(number), N)/45)
   pages <- 1e+10
@@ -30,7 +37,11 @@ f_weibo_get <- function(cH=ch0, N=200, hisnick='chenyibo'){
   # 循环读取页面
   while((nrow(weibo_data) < cnt) & (pg <= pages)){
     # 第一屏
-    the1url <- paste('http://weibo.com/', hisnick, '/profile?page=', pg, sep='')
+    if(is_e){
+      the1url <- paste('http://e.weibo.com/', hisnick, '?page=', pg, '&pre_page=', pg-1, sep='')
+    } else{
+      the1url <- paste('http://weibo.com/', hisnick, '/profile?page=', pg, sep='')
+    }
     the1get <- getURL(the1url, curl=cH, .encoding='UTF-8')
     # 看别人的时候是hisFeed，看自己的时候是myFeed(后面的url也略有差异，主要是刷新的时候需要用到uid)
     myfeed <- paste('^.*<script>STK && STK.pageletM && STK.pageletM.view\\((\\{', 
@@ -46,7 +57,7 @@ f_weibo_get <- function(cH=ch0, N=200, hisnick='chenyibo'){
     }
     
     # 于是第二屏
-    the2url <- paste('http://weibo.com/aj/mblog/mbloglist?_wv=5&page=', pg, 
+    the2url <- paste('http://weibo.com/aj/mblog/mbloglist?', ifelse(is_e, '', '_wv=5&'), 'page=', pg, 
                      '&count=15&max_id=', lastmid, '&pre_page=', pg, '&end_id=&pagebar=0&uid=', oid, sep='')
     the2get <- getURL(the2url, curl=cH, .encoding='UTF-8')
     a2 <- fromJSON(the2get)[['data']]
@@ -58,30 +69,40 @@ f_weibo_get <- function(cH=ch0, N=200, hisnick='chenyibo'){
     }
     
     # 于是第三屏
-    the3url <- paste('http://weibo.com/aj/mblog/mbloglist?_wv=5&page=', pg, 
+    the3url <- paste('http://weibo.com/aj/mblog/mbloglist?', ifelse(is_e, '', '_wv=5&'), 'page=', pg, 
                      '&count=15&max_id=', lastmid, '&pre_page=', pg, '&end_id=&pagebar=1&uid=', oid, sep='')
     the3get <- getURL(the3url, curl=cH, .encoding='UTF-8')
     a3 <- fromJSON(the3get)[['data']]
     
     # 筛选微博正文内容及发表时间
     a123 <- htmlParse(c(a1, a2, a3), encoding='UTF-8')
-    b123 <- getNodeSet(a123, path='//div[@node-type="feed_list_content"]')
+    if(is_e){
+      b123 <- getNodeSet(a123, path='//p[@node-type="feed_list_content"]')
+    } else{
+      b123 <- getNodeSet(a123, path='//div[@node-type="feed_list_content"]')
+    }
     c123 <- sapply(b123, xmlValue)
-    d123 <- getNodeSet(a123, path='//a[@class="S_link2 WB_time"]')
-    e123 <- sapply(d123, function(x){xmlAttrs(x)[['title']]})
+    if(is_e){
+      d123 <- getNodeSet(a123, path='//a[@class="date"]')
+      did <- which(sapply(d123, function(x){names(xmlAttrs(x))[1]} == 'title'))
+      e123 <- sapply(d123[did], function(x){xmlAttrs(x)[['title']]})
+    } else{
+      d123 <- getNodeSet(a123, path='//a[@class="S_link2 WB_time"]')
+      e123 <- sapply(d123, function(x){xmlAttrs(x)[['title']]})
+    }
     if(length(c123) == length(e123)){
       weibo_data <- rbind(weibo_data, data.frame(weibo_content=c123, weibo_time=e123, stringsAsFactors=F))
     } else{
       cat('sorry~~~~length of content != length of time', '\n')
     }
-    cat(nrow(weibo_data), '\n')
     pg <- pg + 1
     f123 <- getNodeSet(a123, path='//a[@action-type="feed_list_page_n"]')
     g123 <- sapply(f123, function(x){xmlAttrs(x)[['action-data']]})
     pages <- max(as.numeric(gsub('page=([0-9]+)', '\\1', g123)))
+    weibo_data <- na.exclude(weibo_data)
+    weibo_data <- weibo_data[!duplicated(weibo_data), ]
+    cat(nrow(weibo_data), '\n')
   }
-  weibo_data <- weibo_data[!is.na(weibo_data[, 1]) & !is.na(weibo_data[, 2]), ]
-  weibo_data <- weibo_data[!duplicated(paste(weibo_data[, 1], weibo_data[, 2])), ]
   cat(hisnick, 'actually has', number, 'blogs,\nand we get', nrow(weibo_data), 'of them this time.')
   return(list(hisnick=hisnick, nick=onick, weibo_data=weibo_data))
 }
