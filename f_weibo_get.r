@@ -14,18 +14,21 @@ f_weibo_get <- function(cH=ch0, N=200, hisnick='chenyibo'){
   require(RCurl)
   require(XML)
   
-  # 先看一下有多少页
-  pg=1
+  # 先看一共有多少微博
+  pg <- 1
   the1url <- paste('http://weibo.com/', hisnick, '/profile?page=', pg, sep='')
   the1get <- getURL(the1url, curl=cH, .encoding='UTF-8')
   oid <- gsub('^.*\\[\'oid\'\\] = \'([^\']+)\';.*$', '\\1', the1get)
   uid <- gsub('^.*\\[\'uid\'\\] = \'([^\']+)\';.*$', '\\1', the1get)
+  onick <- gsub('^.*\\[\'onick\'\\] = \'([^\']+)\';.*$', '\\1', the1get)
   number <- gsub('^.*<strong node-type=\\\\"weibo\\\\">([0-9]+)<\\\\/strong>.*$', '\\1', the1get)
-  pages <- ceiling(min(as.numeric(number), N)/45)
+  cnt <- min(as.numeric(number), N)
+  # pages <- ceiling(min(as.numeric(number), N)/45)
+  pages <- 1e+10
   
-  weibo_data <- c()
+  weibo_data <- data.frame(weibo_content=NULL, weibo_time=NULL)
   # 循环读取页面
-  for (pg in seq_len(pages)){
+  while((nrow(weibo_data) < cnt) & (pg <= pages)){
     # 第一屏
     the1url <- paste('http://weibo.com/', hisnick, '/profile?page=', pg, sep='')
     the1get <- getURL(the1url, curl=cH, .encoding='UTF-8')
@@ -36,45 +39,50 @@ f_weibo_get <- function(cH=ch0, N=200, hisnick='chenyibo'){
     a1 <- gsub(myfeed, '\\1', the1get)
     a1 <- fromJSON(a1)[['html']]
     # 最后一条微博的ID
-    if(length(grep('mid=\"([0-9]+)\"', a1)) > 0){
-      lastmid <- gsub('^.*mid=\"([0-9]+)\".*$', '\\1', a1)
+    if(length(grep('mid=([0-9]+)', a1)) > 0){
+      lastmid <- gsub('^.*mid=([0-9]+).*$', '\\1', a1)
     } else{
       lastmid <- ''
     }
     
     # 于是第二屏
-    the2url <- paste('http://weibo.com/aj/mblog/mbloglist?page=', pg, 
+    the2url <- paste('http://weibo.com/aj/mblog/mbloglist?_wv=5&page=', pg, 
                      '&count=15&max_id=', lastmid, '&pre_page=', pg, '&end_id=&pagebar=0&uid=', oid, sep='')
     the2get <- getURL(the2url, curl=cH, .encoding='UTF-8')
     a2 <- fromJSON(the2get)[['data']]
     # 最后一条微博的ID
-    if(length(grep('mid=\"([0-9]+)\"', a2)) > 0){
-      lastmid <- gsub('^.*mid=\"([0-9]+)\".*$', '\\1', a2)
+    if(length(grep('mid=([0-9]+)', a2)) > 0){
+      lastmid <- gsub('^.*mid=([0-9]+).*$', '\\1', a2)
     } else{
       lastmid <- ''
     }
     
     # 于是第三屏
-    the3url <- paste('http://weibo.com/aj/mblog/mbloglist?page=', pg, 
+    the3url <- paste('http://weibo.com/aj/mblog/mbloglist?_wv=5&page=', pg, 
                      '&count=15&max_id=', lastmid, '&pre_page=', pg, '&end_id=&pagebar=1&uid=', oid, sep='')
     the3get <- getURL(the3url, curl=cH, .encoding='UTF-8')
     a3 <- fromJSON(the3get)[['data']]
     
-    # 筛选微博正文内容
-    b1 <- htmlParse(a1, encoding='UTF-8')
-    b2 <- htmlParse(a2, encoding='UTF-8')
-    b3 <- htmlParse(a3, encoding='UTF-8')
-    c1 <- getNodeSet(b1, path='//div[@node-type="feed_list_content"]')
-    c2 <- getNodeSet(b2, path='//p[@node-type="feed_list_content"]')
-    c3 <- getNodeSet(b3, path='//p[@node-type="feed_list_content"]')
-    c123 <- c(c1, c2, c3)
-    d123 <- sapply(c123, xmlValue)
-    weibo_data <- c(weibo_data, d123)
-    gc()
-    print(length(weibo_data))
+    # 筛选微博正文内容及发表时间
+    a123 <- htmlParse(c(a1, a2, a3), encoding='UTF-8')
+    b123 <- getNodeSet(a123, path='//div[@node-type="feed_list_content"]')
+    c123 <- sapply(b123, xmlValue)
+    d123 <- getNodeSet(a123, path='//a[@class="S_link2 WB_time"]')
+    e123 <- sapply(d123, function(x){xmlAttrs(x)[['title']]})
+    if(length(c123) == length(e123)){
+      weibo_data <- rbind(weibo_data, data.frame(weibo_content=c123, weibo_time=e123, stringsAsFactors=F))
+    } else{
+      cat('sorry~~~~length of content != length of time', '\n')
+    }
+    cat(nrow(weibo_data), '\n')
+    pg <- pg + 1
+    f123 <- getNodeSet(a123, path='//a[@action-type="feed_list_page_n"]')
+    g123 <- sapply(f123, function(x){xmlAttrs(x)[['action-data']]})
+    pages <- max(as.numeric(gsub('page=([0-9]+)', '\\1', g123)))
   }
-  
-  weibo_data <- weibo_data[!is.na(weibo_data)]
-  return(weibo_data)
+  weibo_data <- weibo_data[!is.na(weibo_data[, 1]) & !is.na(weibo_data[, 2]), ]
+  weibo_data <- weibo_data[!duplicated(paste(weibo_data[, 1], weibo_data[, 2])), ]
+  cat(hisnick, 'actually has', number, 'blogs,\nand we get', nrow(weibo_data), 'of them this time.')
+  return(list(hisnick=hisnick, nick=onick, weibo_data=weibo_data))
 }
 
