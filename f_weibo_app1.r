@@ -12,7 +12,9 @@ f_weibo_app1 <- function(hisnick='chenyibo', scale_a=7, scale_b=1){
     unlist(strsplit(mmseg4j(x), ' '))
   }
   words <- unlist(lapply(weibo_data, f_cut))
-  words <- words[words != '转发']
+  words <- words[!words  %in% c('转发','回复')]
+  words[words == '联网'] <- '互联网'
+  words[words == '据分析'] <- '数据分析'
   
   # 统计词频
   words_freq <- sort(table(words), dec=T)
@@ -40,11 +42,6 @@ f_weibo_app1 <- function(hisnick='chenyibo', scale_a=7, scale_b=1){
   
   # 做词云（这个包貌似对中文支持不是很好）
   require(wordcloud)
-  png(paste('weibo_wordcloud_', hisnick, '_', Sys.Date(), '.png', sep=''),width=500,height=500)
-  par(mar=c(0,0,0,0))
-  wordcloud(words_df3$words_names, words_df3$words_freq2, min.freq=0, scale=c(6,1), 
-            max.words=100, random.order=F, colors=rainbow(100,v=0.8,end=0.5), rot.per=0)
-  dev.off()
   
   png(paste('weibo_content_', hisnick, '_', Sys.Date(), '.png', sep=''),width=1000,height=1000)
   par(mfrow=c(2,2), mar=c(1,1,3,1), yaxt='n', 
@@ -60,7 +57,11 @@ f_weibo_app1 <- function(hisnick='chenyibo', scale_a=7, scale_b=1){
   wordcloud(words_df3$words_names, words_df3$words_freq2, min.freq=0, scale=c(scale_a, scale_b), 
             max.words=100, random.order=F, colors=rainbow(100,start=0.5,end=1), rot.per=0)
   plot(0, 0, type='n', xlim=c(0,100), ylim=c(0,100), axes=F)
-  text(50, 50, paste(weibo_get$hisnick, weibo_get$nick, sep='\n'), 
+  text(50, 50, paste(weibo_get$hisnick, 
+                     substr(weibo_get$nick, 1, 5), 
+                     substr(weibo_get$nick, 6, 10), 
+                     substr(weibo_get$nick, 11, 100), 
+                     sep='\n'), 
        cex=6, font=2, col=rgb(0,0.3,1))
   dev.off()
 }
