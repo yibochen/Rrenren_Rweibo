@@ -6,6 +6,20 @@ f_weibo_get <- function(cH=ch0, N=200, hisnick='chenyibo', is_e=F){
   # hisnick 对方的ID
   # is_e    是否企业版
   # 根据操作系统选择加载包
+  pkgs <- installed.packages()[, 1]
+  if(!'XML' %in% pkgs){
+    install.packages('XML', 
+                     repos='http://mirrors.ustc.edu.cn/CRAN/')
+  }
+  if(!'RCurl' %in% pkgs){
+    install.packages('RCurl', 
+                     repos='http://mirrors.ustc.edu.cn/CRAN/')
+  }
+  if(!'RJSONIO' %in% pkgs){
+    install.packages('RJSONIO', 
+                     repos='http://mirrors.ustc.edu.cn/CRAN/')
+  }
+  
   sysname <- Sys.info()['sysname']
   if(length(grep('Windows', sysname)) == 1){
     try(memory.limit(4000), silent=T)

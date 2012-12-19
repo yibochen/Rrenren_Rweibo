@@ -4,8 +4,22 @@
 f_weibo_app1 <- function(hisnick='chenyibo', 
                          scale_a=7, scale_b=1, 
                          cutday='2012-12-21', 
-                         dicdir='./mydic'){
+                         dicdir=NULL){
   load(paste('weibo_saved_', hisnick, '.RData', sep=''))
+  pkgs <- installed.packages()[, 1]
+  if(!'rJava' %in% pkgs){
+    install.packages('rJava', 
+                     repos='http://mirrors.ustc.edu.cn/CRAN/')
+  }
+  if(!'rmmseg4j' %in% pkgs){
+    install.packages('rmmseg4j', 
+                     repos='http://mirrors.ustc.edu.cn/CRAN/')
+  }
+  if(!'wordcloud' %in% pkgs){
+    install.packages('wordcloud', 
+                     repos='http://mirrors.ustc.edu.cn/CRAN/')
+  }
+  
   require(rmmseg4j)
   require(wordcloud)
   weibo_data <- weibo_get$weibo_data[order(
