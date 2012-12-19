@@ -3,7 +3,8 @@
 # 微博关键词及时间分布
 f_weibo_app1 <- function(hisnick='chenyibo', 
                          scale_a=7, scale_b=1, 
-                         cutday='2012-12-21'){
+                         cutday='2012-12-21', 
+                         dicdir='./mydic'){
   load(paste('weibo_saved_', hisnick, '.RData', sep=''))
   require(rmmseg4j)
   require(wordcloud)
@@ -12,20 +13,16 @@ f_weibo_app1 <- function(hisnick='chenyibo',
   weibo_data_all <- sapply(strsplit(weibo_data$weibo_content, '//'), '[', 1)
   flag <- min(which(as.POSIXlt(weibo_data$weibo_time) <= as.POSIXlt(cutday)))
   weibo_data_1 <- sapply(strsplit(weibo_data$weibo_content[flag:nrow(weibo_data)], '//'), '[', 1)
-  weibo_data_2 <- sapply(strsplit(weibo_data$weibo_content[1:(flag-1)], '//'), '[', 1)
+  weibo_data_2 <- sapply(strsplit(weibo_data$weibo_content[(flag-1):1], '//'), '[', 1)
   
-  if(length(weibo_data_1) > length(weibo_data_2)){
-    weibo_data_1 <- weibo_data_1[1:length(weibo_data_2)]
-  }
-  if(length(weibo_data_2) > length(weibo_data_1)){
-    weibo_data_2 <- weibo_data_2[(length(weibo_data_2)-length(weibo_data_1)+1):length(weibo_data_2)]
-  }
+  weibo_data_1 <- weibo_data_1[1:min(length(weibo_data_2),length(weibo_data_1))]
+  weibo_data_2 <- weibo_data_2[1:min(length(weibo_data_2),length(weibo_data_1))]
   
   # 分词
   f_fenci <- function(input=weibo_data){
     weibo_data <- input[input != '' & !is.na(input)]
     f_cut <- function(x){
-      unlist(strsplit(mmseg4j(x), ' '))
+      unlist(strsplit(mmseg4j(x, dicDir=dicdir), ' '))
     }
     words <- unlist(lapply(weibo_data, f_cut))
     words <- words[!words  %in% c('转发','回复')]
