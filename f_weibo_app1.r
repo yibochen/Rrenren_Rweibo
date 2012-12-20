@@ -4,6 +4,7 @@
 f_weibo_app1 <- function(hisnick='chenyibo', 
                          scale_a=7, scale_b=1, 
                          cutday='2012-12-21', 
+                         equal_length=T, 
                          dicdir=NULL){
   load(paste('weibo_saved_', hisnick, '.RData', sep=''))
   pkgs <- installed.packages()[, 1]
@@ -28,9 +29,10 @@ f_weibo_app1 <- function(hisnick='chenyibo',
   flag <- min(which(as.POSIXlt(weibo_data$weibo_time) <= as.POSIXlt(cutday)))
   weibo_data_1 <- sapply(strsplit(weibo_data$weibo_content[flag:nrow(weibo_data)], '//'), '[', 1)
   weibo_data_2 <- sapply(strsplit(weibo_data$weibo_content[(flag-1):1], '//'), '[', 1)
-  
-  weibo_data_1 <- weibo_data_1[1:min(length(weibo_data_2),length(weibo_data_1))]
-  weibo_data_2 <- weibo_data_2[1:min(length(weibo_data_2),length(weibo_data_1))]
+  if(equal_length){
+    weibo_data_1 <- weibo_data_1[1:min(length(weibo_data_2),length(weibo_data_1))]
+    weibo_data_2 <- weibo_data_2[1:min(length(weibo_data_2),length(weibo_data_1))]
+  }
   
   # 分词
   f_fenci <- function(input=weibo_data){

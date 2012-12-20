@@ -9,8 +9,7 @@ f_weibo_login <- function(name='****', pwd='****'){
                      repos='http://mirrors.ustc.edu.cn/CRAN/')
   }
   if(!'RCurl' %in% pkgs){
-    install.packages('RCurl', 
-                     repos='http://mirrors.ustc.edu.cn/CRAN/')
+    install.packages('RCurl')
   }
   if(!'RJSONIO' %in% pkgs){
     install.packages('RJSONIO', 

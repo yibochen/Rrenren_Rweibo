@@ -40,6 +40,7 @@ weibo_get <- f_weibo_get(cH=ch0, N=10000, hisnick='ebaycoe', is_e=T)
 save(weibo_get, file='weibo_saved_ebaycoe.RData')
 
 source('f_weibo_app1.r')
+f_weibo_app1('dr4x', cutday='2012-04-15', equal_length=F, dicdir='./mydic')
 f_weibo_app1('1977581633', cutday='2012-07-01', dicdir='./mydic')
 f_weibo_app1('1710643861')
 f_weibo_app1('302072223', 7, 2)

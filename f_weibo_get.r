@@ -12,8 +12,7 @@ f_weibo_get <- function(cH=ch0, N=200, hisnick='chenyibo', is_e=F){
                      repos='http://mirrors.ustc.edu.cn/CRAN/')
   }
   if(!'RCurl' %in% pkgs){
-    install.packages('RCurl', 
-                     repos='http://mirrors.ustc.edu.cn/CRAN/')
+    install.packages('RCurl')
   }
   if(!'RJSONIO' %in% pkgs){
     install.packages('RJSONIO', 
