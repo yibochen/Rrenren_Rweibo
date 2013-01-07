@@ -27,9 +27,10 @@ f_weibo_app1 <- function(hisnick='chenyibo',
   weibo_data <- weibo_get$weibo_data[order(
     -as.numeric(as.POSIXlt(weibo_get$weibo_data$weibo_time))), ]
   weibo_data_all <- sapply(strsplit(weibo_data$weibo_content, '//'), '[', 1)
+  weibo_data_all <- gsub('@[^@]+ ', ' ', weibo_data_all)
   flag <- min(which(as.POSIXlt(weibo_data$weibo_time) <= as.POSIXlt(cutday)))
-  weibo_data_1 <- sapply(strsplit(weibo_data$weibo_content[flag:nrow(weibo_data)], '//'), '[', 1)
-  weibo_data_2 <- sapply(strsplit(weibo_data$weibo_content[(flag-1):1], '//'), '[', 1)
+  weibo_data_1 <- weibo_data_all[flag:nrow(weibo_data)]
+  weibo_data_2 <- weibo_data_all[(flag-1):1]
   if(equal_length){
     weibo_data_1 <- weibo_data_1[1:min(length(weibo_data_2),length(weibo_data_1))]
     weibo_data_2 <- weibo_data_2[1:min(length(weibo_data_2),length(weibo_data_1))]
