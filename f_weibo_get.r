@@ -1,6 +1,6 @@
 
 
-# 抓取数据的函数。目前只写了feeds部分的抓取，其他是类似的，而且会更简单一点，不需要刷新页面。
+# 抓取数据（目前只写了feeds部分的抓取）
 f_weibo_get <- function(cH=ch0, N=200, hisnick='chenyibo', is_e=F){
   # N       想要获取的微博条数
   # hisnick 对方的ID

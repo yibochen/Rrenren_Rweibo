@@ -26,7 +26,7 @@ f_weibo_login <- function(name='****', pwd='****'){
   require(RCurl)
   require(digest)
   
-  # 对ID的预处理
+  # ID预处理
   name1 <- URLencode(name, reserved=T)
   name2 <- base64(name1)[1]
   

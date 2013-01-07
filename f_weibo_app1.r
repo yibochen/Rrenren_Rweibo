@@ -2,26 +2,27 @@
 
 # 微博关键词及时间分布
 f_weibo_app1 <- function(hisnick='chenyibo', 
-                         scale_a=7, scale_b=1, 
-                         cutday='2012-12-21', 
-                         equal_length=T, 
-                         dicdir=NULL){
+                         scale_a=4, scale_b=1, 
+                         cutday='2012-04-01', 
+                         equal_length=F, 
+                         mydic=NULL, 
+                         cnt_words=100){
   load(paste('weibo_saved_', hisnick, '.RData', sep=''))
   pkgs <- installed.packages()[, 1]
   if(!'rJava' %in% pkgs){
     install.packages('rJava', 
                      repos='http://mirrors.ustc.edu.cn/CRAN/')
   }
-  if(!'rmmseg4j' %in% pkgs){
-    install.packages('rmmseg4j', 
-                     repos='http://mirrors.ustc.edu.cn/CRAN/')
+  if(!'Rwordseg' %in% pkgs){
+    install.packages('Rwordseg', 
+                     repos='http://R-Forge.R-project.org')
   }
   if(!'wordcloud' %in% pkgs){
     install.packages('wordcloud', 
                      repos='http://mirrors.ustc.edu.cn/CRAN/')
   }
   
-  require(rmmseg4j)
+  require(Rwordseg)
   require(wordcloud)
   weibo_data <- weibo_get$weibo_data[order(
     -as.numeric(as.POSIXlt(weibo_get$weibo_data$weibo_time))), ]
@@ -34,24 +35,20 @@ f_weibo_app1 <- function(hisnick='chenyibo',
     weibo_data_2 <- weibo_data_2[1:min(length(weibo_data_2),length(weibo_data_1))]
   }
   
+  if(!is.null(mydic)){
+    installDict(mydic)
+  }
   # 分词
   f_fenci <- function(input=weibo_data){
     weibo_data <- input[input != '' & !is.na(input)]
-    f_cut <- function(x){
-      unlist(strsplit(mmseg4j(x, dicDir=dicdir), ' '))
-    }
-    words <- unlist(lapply(weibo_data, f_cut))
+    words <- unlist(segmentCN(weibo_data))
     words <- words[!words  %in% c('转发','回复')]
-    words[words == '联网'] <- '互联网'
-    words[words == '据分析'] <- '数据分析'
     
     # 统计词频
     words_freq <- sort(table(words), dec=T)
     words_names <- names(words_freq)
     words_length <- nchar(words_names)
     words_df <- data.frame(words_names=words_names, words_freq=words_freq, words_length=words_length)
-    # 只做两三个字的词，简单一点。。。
-    # words_df <- words_df[words_df$words_length %in% c(2,3), ]
     
     # 加载搜狗实验室的词频文件
     SogouLabDic <- readLines('SogouLabDic.dic')
@@ -62,11 +59,10 @@ f_weibo_app1 <- function(hisnick='chenyibo',
     SogouLabDic_match$X2 <- as.numeric(SogouLabDic_match$X2)
     
     words_df2 <- merge (words_df, SogouLabDic_match, by='words_names', all.x=T)
-    # 可以筛选名词和动词。不过似乎没有必要，因为形容词副词什么的也能够体现用词风格嘛
-    # words_df2 <- words_df2[grep('^[NV],$',words_df2$X3), ]
     
     # 匹配不到的扔掉
     words_df3 <- words_df2[!is.na(words_df2$X2), ]
+    words_df3 <- words_df3[grep('^[NV],',words_df3$X3), ]
     words_df3$words_freq2 <- words_df3$words_freq * log(max(words_df3$X2)/words_df3$X2)
     
     return(words_df3)
@@ -84,13 +80,22 @@ f_weibo_app1 <- function(hisnick='chenyibo',
   weibo_time <- strptime(substr(weibo_get$weibo_data$weibo_time, 12, 16), format='%H:%M')
   hist(weibo_time, breaks='hours', 
        main=paste('TA主要在神马时间发微博？', sep=''), 
-       col=rgb(0,0.5,1), border=rgb(0,0.5,1), xlab=NULL, ylab=NULL)
+       # border=rgb(0,0.5,1), 
+       col=rgb(0,0.5,1), xlab=NULL, ylab=NULL)
   weibo_time <- strptime(weibo_get$weibo_data$weibo_time, format='%Y-%m-%d %H:%M')
   hist(weibo_time, breaks='months', 
        main=paste('TA的微博是不是越发越勤快？', sep=''), 
-       col=rgb(0,0.5,1), border=rgb(0,0.5,1), xlab=NULL, ylab=NULL)
-  wordcloud(words_df3$words_names, words_df3$words_freq2, min.freq=0, scale=c(scale_a, scale_b), 
-            max.words=100, random.order=F, colors=rainbow(100,start=0.5,end=1), rot.per=0)
+       # border=rgb(0,0.5,1), 
+       col=rgb(0,0.5,1), xlab=NULL, ylab=NULL)
+  cnt_words <- min(nrow(words_df3), cnt_words)
+  words_df4 <- words_df3[order(-words_df3$words_freq2), c('words_names','words_freq2')]
+  words_df4 <- words_df4[seq_len(cnt_words), ]
+  clusters <- kmeans(words_df4$words_freq2, 10)
+  words_df4$words_freq3 <- as.numeric(as.factor(clusters$centers[clusters$cluster, 1]))
+  wordcloud(words_df4$words_names, words_df4$words_freq3, scale=c(scale_a, scale_b), 
+            max.words=cnt_words, min.freq=0, random.order=F, 
+            colors=rainbow(cnt_words,start=3/6,end=4/6), 
+            rot.per=0, font=2)
   plot(0, 0, type='n', xlim=c(0,100), ylim=c(0,100), axes=F)
   text(0, 50, paste(weibo_get$nick, '\n', 
                     '在', cutday, '之前的\n', 
