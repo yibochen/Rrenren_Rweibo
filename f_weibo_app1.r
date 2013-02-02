@@ -77,25 +77,23 @@ f_weibo_app1 <- function(hisnick='chenyibo',
   
   png(paste('weibo_content_', hisnick, '_', Sys.Date(), '.png', sep=''),width=1000,height=1000)
   par(mfrow=c(2,2), mar=c(1,1,3,1), yaxt='n', 
-      cex.main=2.5, col.main=rgb(0,0,0.5), cex.axis=2, bg=rgb(0.6,1,1))
+      cex.main=2.5, cex.axis=2)
   weibo_time <- strptime(substr(weibo_get$weibo_data$weibo_time, 12, 16), format='%H:%M')
   hist(weibo_time, breaks='hours', 
        main=paste('TA主要在神马时间发微博？', sep=''), 
-       # border=rgb(0,0.5,1), 
-       col=rgb(0,0.5,1), xlab=NULL, ylab=NULL)
+       col='darkgray', border='white', xlab=NULL, ylab=NULL)
   weibo_time <- strptime(weibo_get$weibo_data$weibo_time, format='%Y-%m-%d %H:%M')
   hist(weibo_time, breaks='months', 
        main=paste('TA的微博是不是越发越勤快？', sep=''), 
-       # border=rgb(0,0.5,1), 
-       col=rgb(0,0.5,1), xlab=NULL, ylab=NULL)
+       col='darkgray', border='white', xlab=NULL, ylab=NULL)
   cnt_words <- min(nrow(words_df3), cnt_words)
   words_df4 <- words_df3[order(-words_df3$words_freq2), c('words_names','words_freq2')]
   words_df4 <- words_df4[seq_len(cnt_words), ]
   clusters <- kmeans(words_df4$words_freq2, 10)
   words_df4$words_freq3 <- as.numeric(as.factor(clusters$centers[clusters$cluster, 1]))
-  wordcloud(words_df4$words_names, words_df4$words_freq3, scale=c(scale_a, scale_b), 
+  wordcloud(words=words_df4$words_names, freq=words_df4$words_freq3, scale=c(scale_a, scale_b), 
             max.words=cnt_words, min.freq=0, random.order=F, 
-            colors=rainbow(cnt_words,start=3/6,end=4/6), 
+            colors=rev(grey((seq_len(cnt_words)-1)*0.6/(cnt_words-1))), 
             rot.per=0, font=2)
   plot(0, 0, type='n', xlim=c(0,100), ylim=c(0,100), axes=F)
   text(0, 50, paste(weibo_get$nick, '\n', 
@@ -110,7 +108,7 @@ f_weibo_app1 <- function(hisnick='chenyibo',
                     paste(c(words_2[4:6], ''), collapse=';'), '\n', 
                     paste(c(words_2[7:9]), collapse=';'), 
                     sep=''), 
-       cex=3, font=2, adj=0, col=rgb(0,0.3,1))
+       cex=3, font=2, adj=0, col=grey(0.01))
   dev.off()
 }
 
